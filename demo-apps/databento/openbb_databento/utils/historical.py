@@ -86,10 +86,10 @@ def fetch_historical_continuous(
         raise TypeError("cme_database must be an instance of CmeDatabase.")
 
     interval = interval or "day"
-    start_date = start_date or "2013-01-01"
+    start_date = start_date or "2020-01-01"
     end_date = end_date or None
     contract = int(contract) if contract is not None else 0
-    roll_rule = roll_rule or "c"
+    roll_rule = roll_rule or "v"
 
     if roll_rule not in ["c", "n", "v"]:
         raise ValueError(
@@ -110,7 +110,7 @@ def fetch_historical_continuous(
     symbols = [f"{a}.{roll_rule}.{contract}" for a in assets]
 
     end_date = (
-        (datetime.now(tz=timezone("UTC")) - timedelta(days=1))
+        datetime.now(tz=timezone("UTC"))
         .replace(hour=23, minute=59, second=59, microsecond=0)
         .isoformat()
         if end_date is None
@@ -139,7 +139,16 @@ def fetch_historical_continuous(
             cme_database.logger.warning(
                 "Data schema not fully available. Using end date: %s", end_date
             )
-
+        elif err.get("case") == "data_end_after_available_end":
+            msg = err.get("message", "")
+            end_date = (
+                msg.split("'")[1].replace(" ", "T").split(".")[0] + "+00:00"
+                if "'" in msg
+                else None
+            )
+            cme_database.logger.info("Retrieving data up to date: %s", end_date)
+            if end_date is None:
+                raise e from e
         else:
             raise BentoError(e) from e
         try:

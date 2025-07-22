@@ -306,7 +306,7 @@ class CmeDatabase:
         roll_rule : Optional[str]
             The roll rule to apply when setting the live grid assets.
             Set as one of "c", "n", or "v" - calendar, open interest, or volume.
-            If None, defaults to "c".
+            If None, defaults to "v".
 
         Returns
         -------
@@ -320,7 +320,7 @@ class CmeDatabase:
             )
             return False
 
-        roll_rule = roll_rule or "c"
+        roll_rule = roll_rule or "v"
 
         try:
             symbols = symbols or live_grid_assets
@@ -628,7 +628,7 @@ class CmeDatabase:
             Assets should be an asset from the `futures_symbols` asset column.
         start_date : Optional[str]
             The start date for the data download in 'YYYY-MM-DD' format.
-            If None, defaults to '2013-01-01'.
+            If None, defaults to '2020-01-01'.
         end_date : Optional[str]
             The end date for the data download in 'YYYY-MM-DD' format.
             If None, defaults to yesterday's date.
@@ -641,7 +641,7 @@ class CmeDatabase:
         roll_rule : Optional[Literal["c", "n", "v"]]
             The roll rule to apply when downloading the data.
             Set as one of "c", "n", or "v" - calendar, open interest, or volume.
-            If None, defaults to "c".
+            If None, defaults to "v".
 
         Returns
         -------

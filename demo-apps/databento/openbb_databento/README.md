@@ -70,6 +70,7 @@ database = CmeDatabase()  # add `api_key=YOUR_KEY` if the environment variable i
 futures_symbols = database.generate_futures_symbols_db()
 
 # WARNING: This will take several long minutes to complete.
+# The default start date is 2020-01-01, use 'start_date' to define a longer period.
 ohlc = database.download_historical_continuous()
 
 # Verify the tables are setup and exit the Python interpreter.
@@ -83,6 +84,8 @@ openbb-databento
 ```
 
 Open [Workspace](https://pro.openbb.co), and add the application with the URL of the running server.
+
+**Note**: If the server is started over `0.0.0.0`, add the backend to OpenBB Workspace as `127.0.0.1` when the browswer is on the same machine.
 
 The sections below expand on contents of this app, and how to use the code.
 
