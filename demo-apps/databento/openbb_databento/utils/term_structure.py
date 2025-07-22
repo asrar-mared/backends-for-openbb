@@ -60,11 +60,10 @@ def download_term_structure(
 
     now = now.replace(hour=0, minute=0, second=0, microsecond=0)
     results = DataFrame()
+
     try:
         asset_symbols = cme_database.get_asset_symbols(asset, now.strftime("%Y-%m-%d"))
-        print(asset_symbols)
         instrument_ids = asset_symbols.instrument_id.unique().tolist()
-
         data = client.timeseries.get_range(
             dataset="GLBX.MDP3",
             schema="statistics",
