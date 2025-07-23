@@ -136,12 +136,8 @@ async def get_data_ssrm(
         # Results are already formatted and cleaned by our modular system
         clean_results = formatted_results
 
-        # Prepare response with debug information
-        # Must contain data + rows - debug_info is optional
-        response = {
-            "rowData": clean_results,
-            "rowCount": total_count
-        }
+        # Prepare response, Must contain rowData + rowCount
+        response = {"rowData": clean_results, "rowCount": total_count}
 
         return response
 

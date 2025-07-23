@@ -146,10 +146,15 @@ class QueryBuilder:
         condition_type = filter_config.get("type", "contains")
         filter_value = filter_config.get("filter", "")
 
-        if not filter_value:
+        escaped_field = self.escape_column(field_name)
+        if condition_type == "notBlank":
+            return f"{escaped_field} IS NOT NULL AND {escaped_field} != ''"
+        elif condition_type == "blank":
+            return f"{escaped_field} IS NULL OR {escaped_field} = ''"
+        elif not filter_value:
+            # If filter value is empty, return no condition
             return None
 
-        escaped_field = self.escape_column(field_name)
         escaped_value = filter_value.replace("'", "''")  # Escape single quotes
 
         if condition_type == "contains":
@@ -187,6 +192,10 @@ class QueryBuilder:
         elif condition_type == "inRange":
             filter_to = filter_config.get("filterTo", filter_value)
             return f"{escaped_field} BETWEEN {filter_value} AND {filter_to}"
+        elif condition_type == "notBlank":
+            return f"{escaped_field} IS NOT NULL AND {escaped_field} != 0"
+        elif condition_type == "blank":
+            return f"{escaped_field} IS NULL OR {escaped_field} = 0"
 
         return None
 
@@ -314,7 +323,7 @@ class QueryBuilder:
             import traceback
 
             traceback.print_exc()
-            raise
+            raise e
 
     def build_count_query(self) -> str:
         """
@@ -334,4 +343,4 @@ class QueryBuilder:
             # Regular count query
             return f"SELECT COUNT(*) FROM {self.table_name}{self.create_where_sql()}"
         except Exception as e:
-            raise
+            raise e

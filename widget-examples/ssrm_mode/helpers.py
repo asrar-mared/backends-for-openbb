@@ -65,7 +65,7 @@ async def perform_ssrm_query(
         return total_count, formatted_results
 
     except Exception as e:
-        raise
+        raise e
 
 
 @overload
