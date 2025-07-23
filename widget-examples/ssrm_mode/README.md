@@ -93,7 +93,7 @@ Set up your widgets in the widgets.json to work with OpenBB Workspace.
         "description": "Custom data with SSRM functionality",
         "category": "my-category",
         "searchCategory": "data-ssrm",
-        "type": "ssrm_table", 
+        "type": "ssrm_table",
         "endpoint": "data-ssrm",
         "gridData": {
             "w": 24,
@@ -102,9 +102,10 @@ Set up your widgets in the widgets.json to work with OpenBB Workspace.
     }
 }
 
+```
 ## 🔧 Customization for Different Databases
 
-### Option 1: SQLite (Easiest)
+### Option 1: SQLite
 
 **For new SQLite database:**
 
@@ -120,6 +121,7 @@ db_manager = create_database_manager(
 )
 ```
 
+
 ### Option 2: MySQL
 
 **Setup MySQL connection:**
@@ -134,7 +136,7 @@ db_manager = create_database_manager(
     connection_config={
         "host": "localhost",
         "database": "your_database",
-        "user": "your_username", 
+        "user": "your_username",
         "password": "your_password",
         "port": 3306
     },
@@ -163,10 +165,10 @@ class PostgreSQLConnection:
     def __init__(self, connection_config):
         import psycopg2
         self.config = connection_config
-    
+
     def get_connection(self):
         return psycopg2.connect(**self.config)
-    
+
     # Implement other required methods...
 
 # In helpers.py - update create_database_manager()
