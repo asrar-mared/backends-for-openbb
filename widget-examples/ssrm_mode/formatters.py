@@ -54,9 +54,7 @@ def convert_database_row_to_dict(row: Any) -> Dict[str, Any]:
         return {"data": row}
 
 
-def format_query_results(
-    results: List[Dict[str, Any]], is_grouped: bool = False
-) -> List[Dict[str, Any]]:
+def format_query_results(results: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
     """
     Format query results for API response.
 
