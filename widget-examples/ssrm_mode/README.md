@@ -105,7 +105,7 @@ Set up your widgets in the widgets.json to work with OpenBB Workspace.
 ```
 ## 🔧 Customization for Different Databases
 
-### Option 1: SQLite (Easiest)
+### Option 1: SQLite
 
 **For new SQLite database:**
 
