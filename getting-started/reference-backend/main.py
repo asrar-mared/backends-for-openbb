@@ -2590,7 +2590,7 @@ async def form_submit(params: dict) -> JSONResponse:
     "name": "Entry Form",
     "description": "Example of a more complex entry form",
     "category": "forms",
-    "searchCategory": "form",
+    "subcategory": "form",
     "endpoint": "all_forms",  # The GET endpoint that provides the form data
     "type": "table",  # The form data is displayed in a table format
     "gridData": {
@@ -3447,8 +3447,8 @@ def markdown_widget_with_organized_params(
 @register_widget({
     "name": "Stock Sparkline Data - With Min/Max Points",
     "description": "Display stock data with sparkline charts highlighting minimum and maximum values",
-    "category": "bny",
-    "searchCategory": "sparkline",
+    "category": "Widgets",
+    "subcategory": "sparkline",
     "defaultViz": "table",
     "endpoint": "sparkline",
     "gridData": {
@@ -3641,8 +3641,8 @@ async def get_sparkline_data():
 @register_widget({
     "name": "Stock Price Trends - Line Sparklines with First/Last Points",
     "description": "Display stock price trends using line sparklines highlighting first and last points",
-    "category": "bny",
-    "searchCategory": "sparkline-line",
+    "category": "Widgets",
+    "subcategory": "sparkline-line",
     "defaultViz": "table",
     "endpoint": "sparkline-line",
     "gridData": {
@@ -3778,8 +3778,8 @@ async def get_line_sparkline_data():
 @register_widget({
     "name": "Trading Volume - Area Sparklines",
     "description": "Display trading volume data using area sparklines with maximum point highlighting",
-    "category": "bny",
-    "searchCategory": "sparkline-area",
+    "category": "Widgets",
+    "subcategory": "sparkline-area",
     "defaultViz": "table",
     "endpoint": "sparkline-area",
     "gridData": {
@@ -3855,8 +3855,8 @@ async def get_line_sparkline_data():
 @register_widget({
     "name": "P&L Analysis - Bar Sparklines with Custom Formatter",
     "description": "Display profit/loss data using bar sparklines with custom positive/negative coloring",
-    "category": "bny",
-    "searchCategory": "sparkline-custom",
+    "category": "Widgets",
+    "subcategory": "sparkline-custom",
     "defaultViz": "table",
     "endpoint": "sparkline-custom",
     "gridData": {
@@ -4041,8 +4041,8 @@ async def get_custom_sparkline_data():
 @register_widget({
     "name": "Monthly Performance - Bar Sparklines with Positive/Negative",
     "description": "Display monthly performance data using bar sparklines with positive/negative styling",
-    "category": "bny",
-    "searchCategory": "sparkline-bar",
+    "category": "Widgets",
+    "subcategory": "sparkline-bar",
     "defaultViz": "table",
     "endpoint": "sparkline-bar",
     "gridData": {
@@ -4213,8 +4213,8 @@ async def get_bar_sparkline_data():
 @register_widget({
     "name": "Quarterly Earnings - Column Sparklines",
     "description": "Display quarterly earnings data using column sparklines",
-    "category": "bny",
-    "searchCategory": "sparkline-column",
+    "category": "Widgets",
+    "subcategory": "sparkline-column",
     "defaultViz": "table",
     "endpoint": "sparkline-column",
     "gridData": {
