@@ -52,22 +52,24 @@ def download_asset_symbols(
         raise TypeError("cme_database must be an instance of CmeDatabase.")
 
     client = cme_database.db_client()
-
     now = datetime.strptime(date, "%Y-%m-%d") if date is not None else datetime.now()
+
     if now.weekday() in [5, 6]:
         # If today is Saturday or Sunday, set 'now' to the previous Friday
         now = now - timedelta(days=1 if now.weekday() == 5 else 2)
+
     now = now.replace(hour=0, minute=0, second=0, microsecond=0)
-    start_date = (
-        (now - timedelta(days=1)).strftime("%Y-%m-%d")
-        if date is None
-        else now.strftime("%Y-%m-%d")
-    )
-    end_date = (
-        now.strftime("%Y-%m-%d")
-        if date is None
-        else (now + timedelta(days=1)).strftime("%Y-%m-%d")
-    )
+    date = now.strftime("%Y-%m-%d")
+    dataset_range: dict = client.metadata.get_dataset_range(dataset="GLBX.MDP3")
+    schema_end = dataset_range.get("schema", {}).get("definition", {}).get("end", "")
+    schema_end_date = schema_end.split("T")[0]
+
+    if date is not None and date == schema_end_date:
+        end_date = schema_end
+        start_date = now.strftime("%Y-%m-%d") if date is None else date
+    else:
+        start_date = now.strftime("%Y-%m-%d") if date is None else date
+        end_date = None
 
     try:
         data = client.timeseries.get_range(

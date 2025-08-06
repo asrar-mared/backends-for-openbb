@@ -99,7 +99,7 @@ async def search_symbols(
             .sort_values(by=["asset_class", "asset", "name"])
             .to_dict("records")
         ):
-            item["symbol"] = item["symbol"].replace(".c.", ".C.")
+            item["symbol"] = item["symbol"].replace(".c.", ".C.").replace(".v.", ".V.")
             multiplier = item.get("contract_unit_multiplier", 1)
             if multiplier is None or multiplier == 0:
                 multiplier = 1
@@ -148,7 +148,25 @@ async def history(
     countback: Optional[int] = None,
 ) -> dict:
     """Get OHLC bars."""
-    symbol = symbol.replace(".C.", ".c.")
+    symbol = symbol.replace(".C.", ".c.").replace(".V.", ".v.")
+    is_intraday = False
+    intraday_resolutions = {
+        "3": "3T",
+        "5": "5T",
+        "15": "15T",
+        "30": "30T",
+        "45": "45T",
+        "120": "120T",
+        "180": "180T",
+        "240": "240T",
+    }
+
+    if resolution in ("60", 60, "120", 120, "180", 180, "240", 240):
+        resolution = "60"
+        is_intraday = True
+    elif resolution in ("1", 1, "3", 3, "5", 5, "15", 15, "30", 30, "45", 45):
+        resolution = "1"
+        is_intraday = True
 
     df = data.get_ohlcv_data(symbol=symbol, interval=resolution if resolution else "1d")
     if df.empty or len(df.index) == 0:
@@ -162,6 +180,26 @@ async def history(
         else:
             rule = "MS"
         df = df.reset_index(drop=True).set_index("date")
+        df = (
+            df.resample(rule)
+            .agg(
+                {
+                    "open": "first",
+                    "high": "max",
+                    "low": "min",
+                    "close": "last",
+                    "volume": "sum",
+                }
+            )
+            .dropna()
+            .reset_index()
+        )
+        df.date = to_datetime(df.date)
+
+    elif is_intraday is True and resolution in intraday_resolutions:
+        df.date = to_datetime(df.date)
+        df = df.reset_index(drop=True).set_index("date")
+        rule = intraday_resolutions[resolution]
         df = (
             df.resample(rule)
             .agg(

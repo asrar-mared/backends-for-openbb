@@ -316,6 +316,7 @@ The symbol info fed to the UDF server will depend on the contents of the databas
 
 If the symbol is found in tables, `ohlcv_1h_continuous` table, the supported resolutions will be added.
 
+One-minute and one-hour resolutions are resampled to support the additional intraday resolutions available to select.
 
 ```python
 from openbb_databento.utils.udf import UdfDatabase

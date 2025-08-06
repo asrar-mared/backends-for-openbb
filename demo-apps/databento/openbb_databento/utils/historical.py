@@ -93,7 +93,7 @@ def fetch_historical_continuous(
 
     if roll_rule not in ["c", "n", "v"]:
         raise ValueError(
-            "roll_rule must be one of 'c' (calendar), 'n' (nearest), or 'v' (volume)."
+            "roll_rule must be one of 'c' (calendar), 'n' (open interest), or 'v' (volume)."
         )
 
     if interval not in ["second", "minute", "hour", "day"]:
@@ -108,18 +108,15 @@ def fetch_historical_continuous(
     names_map = assets_df.set_index("asset").name.to_dict()
     assets = symbols or assets_df.asset.tolist()
     symbols = [f"{a}.{roll_rule}.{contract}" for a in assets]
+    schema = f"ohlcv-1{interval[0]}"
+    dataset_range: dict = client.metadata.get_dataset_range(dataset="GLBX.MDP3")
+    schema_end = dataset_range.get("schema", {}).get(schema, {}).get("end")
+    end_date = schema_end if end_date is None else end_date
 
-    end_date = (
-        datetime.now(tz=timezone("UTC"))
-        .replace(hour=23, minute=59, second=59, microsecond=0)
-        .isoformat()
-        if end_date is None
-        else end_date
-    )
     try:
         data = client.timeseries.get_range(
             dataset="GLBX.MDP3",
-            schema=f"ohlcv-1{interval[0]}",
+            schema=schema,
             stype_in="continuous",
             symbols=symbols,
             start=start_date,
@@ -154,7 +151,7 @@ def fetch_historical_continuous(
         try:
             data = client.timeseries.get_range(
                 dataset="GLBX.MDP3",
-                schema=f"ohlcv-1{interval[0]}",
+                schema=schema,
                 symbols=symbols,
                 start=start_date,
                 end=end_date,
@@ -314,6 +311,10 @@ def update_historical_continuous_table(
     client = cme_database.db_client()
     now = datetime.now(tz=timezone("UTC")).replace(microsecond=0)
 
+    schema_date_range: dict = client.metadata.get_dataset_range(dataset="GLBX.MDP3")
+    schema = table_name.replace("_continuous", "").replace("_", "-")
+    schema_end = schema_date_range.get("schema", {}).get(schema, {}).get("end", None)
+
     for chunk_idx, symbol_chunk in enumerate(symbol_chunks, 1):
         msg = (
             f"Processing chunk {chunk_idx}/{len(symbol_chunks)} "
@@ -324,11 +325,11 @@ def update_historical_continuous_table(
         try:
             data = client.timeseries.get_range(
                 dataset="GLBX.MDP3",
-                schema=table_name.replace("_continuous", "").replace("_", "-"),
+                schema=schema,
                 stype_in="continuous",
                 symbols=symbol_chunk,
                 start=last_date,
-                end=now.isoformat(),
+                end=schema_end or now.isoformat(),
             )
         except BentoError as e:
             end_date = None

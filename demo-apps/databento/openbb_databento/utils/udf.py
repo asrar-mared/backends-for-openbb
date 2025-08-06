@@ -132,7 +132,7 @@ class UdfDatabase:
         interval_str = (
             "1d"
             if interval[-1] in ["D", "W", "M"]
-            else "1h" if interval in ("60", 60) else f"{interval}"
+            else "1h" if interval in ("60", 60) else f"{interval}m"
         )
         table_name = f"ohlcv_{interval_str.lower()}_continuous"
 
@@ -153,7 +153,7 @@ class UdfDatabase:
     def get_symbol_info(self, symbol: str, interval: Optional[str] = None) -> dict:
         """Get symbol information from the database."""
         # Create cache key
-        symbol = symbol.replace(".C.", ".c.")
+        symbol = symbol.replace(".C.", ".c.").replace(".V.", ".v.")
         cache_key = f"{symbol}_{interval or '1d'}"
 
         if cache_key in self._symbol_info_cache:
@@ -186,7 +186,7 @@ class UdfDatabase:
 
         if not symbol_info:
             return {"s": "no_data"}
-        symbol = symbol.replace(".c.", ".C.")
+        symbol = symbol.replace(".c.", ".C.").replace(".v.", ".V.")
         udf_symbol_info: dict = {
             "symbol": symbol,
             "ticker": symbol,
@@ -251,7 +251,9 @@ class UdfDatabase:
                         multiplier = int(interval_part[:-1])
                         resolution = str(multiplier)
                         if resolution not in supported_resolutions:
-                            supported_resolutions.append(resolution)
+                            supported_resolutions.extend(
+                                [resolution, "3", "5", "15", "30", "45"]
+                            )
                         symbol_has_intraday = True
                     # Handle hour intervals - convert to minutes for supported_resolutions
                     elif interval_part.endswith("h"):
@@ -259,7 +261,9 @@ class UdfDatabase:
                         minutes = multiplier * 60
                         resolution = str(minutes)
                         if resolution not in supported_resolutions:
-                            supported_resolutions.append(resolution)
+                            supported_resolutions.extend(
+                                [resolution, "120", "180", "240"]
+                            )
                         symbol_has_intraday = True
 
             if has_seconds is True:
