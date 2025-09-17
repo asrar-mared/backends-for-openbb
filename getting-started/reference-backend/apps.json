@@ -676,7 +676,7 @@
             "h": 22,
             "state": {
               "params": {
-                "prompt": "asda asd asd asd asd as dasd asd asda",
+                "prompt": "Hello World",
                 "type": "markdown"
               }
             }
