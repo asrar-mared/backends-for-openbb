@@ -3311,7 +3311,7 @@ class OmniWidgetResponse(BaseModel):
         {
             "paramName": "prompt",
             "type": "text",
-            "description": "The prompt to send to the LLM to make queries or ask questions.",
+            "description": "The prompt to send to the widget to make queries, ask questions or simply interact with it. This is required in order to get a response.",
             "label": "Prompt",
             "show": False
         },
@@ -3453,7 +3453,7 @@ This is a basic omni widget response without citation tracking.
         {
             "paramName": "prompt",
             "type": "text",
-            "description": "The prompt to send to the LLM to make queries or ask questions.",
+            "description": "The prompt to send to the widget to make queries, ask questions or simply interact with it. This is required in order to get a response.",
             "label": "Prompt",
             "show": False
         },
