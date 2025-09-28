@@ -1,13 +1,19 @@
-# Dynamic AgGrid Widget for OpenBB Workspace
+# Company Revenue Dashboard & MCP Server
 
-This project demonstrates a dynamic AgGrid table widget for OpenBB Workspace with three interactive parameters that affect the displayed data in real-time.
+This project provides both an OpenBB Workspace widget and an HTTP API server for accessing company revenue data. The widget displays interactive revenue metrics with ticker selection, while the HTTP API exposes the same functionality via REST endpoints.
 
 ## Features
 
-### Interactive Parameters
-- **📅 Date Picker**: Select start date for data generation (affects 7-day range)
-- **📝 Text Input**: Company name prefix (customizes company names)
-- **📊 Dropdown**: Data category selection (Financial, Operational, Marketing, HR metrics)
+### OpenBB Widget Features
+- **📅 Date Picker**: Select start date for revenue data (7-day range)
+- **📊 Ticker Dropdown**: Select from major tech stocks (AAPL, MSFT, GOOGL, AMZN, TSLA, META, NVDA)
+- **💰 Revenue Metrics**: Daily revenue data with percentage changes and trends
+
+### HTTP API Features
+- **🌐 REST Endpoints**: GET and POST endpoints for revenue data retrieval
+- **📈 Revenue Analytics**: 7 days of revenue data with summary statistics
+- **🔧 Flexible Parameters**: Ticker symbol and date range selection
+- **📚 Interactive Docs**: Swagger/OpenAPI documentation included
 
 ### AgGrid Capabilities
 - **Advanced Table Features**: Column definitions, formatting, sorting, filtering
@@ -29,21 +35,34 @@ source venv/bin/activate  # On Windows: venv\Scripts\activate
 pip install -r requirements.txt
 ```
 
-### 2. Run the Server
+### 2. Run the OpenBB Widget Server
 
 ```bash
 python main.py
 ```
 
-The server will start on `http://localhost:8000`
+The server will start on `http://localhost:8012`
 
-### 3. Verify Installation
+### 3. Run the HTTP API Server
 
-Visit these URLs to confirm everything is working:
+```bash
+python mcp_server.py
+```
 
-- **Widget Registry**: http://localhost:8000/widgets.json
-- **Root Endpoint**: http://localhost:8000/
-- **Sample Data**: http://localhost:8000/dynamic_aggrid_table
+The API server will start on `http://localhost:8013`
+
+### 4. Verify Installation
+
+**OpenBB Widget URLs:**
+- **Widget Registry**: http://localhost:8012/widgets.json
+- **Root Endpoint**: http://localhost:8012/
+- **Sample Data**: http://localhost:8012/dynamic_aggrid_table
+
+**HTTP API URLs:**
+- **API Root**: http://localhost:8013/
+- **Interactive Docs**: http://localhost:8013/docs
+- **Revenue Data**: http://localhost:8013/revenue-data
+- **Example**: http://localhost:8013/revenue-data?ticker=AAPL&start_date=2024-01-01
 
 ## Integration with OpenBB Workspace
 
@@ -52,12 +71,12 @@ Visit these URLs to confirm everything is working:
 1. **Open OpenBB Workspace**
 2. **Add Custom Backend**:
    - Go to Settings → Widgets
-   - Add custom backend URL: `http://localhost:8000`
+   - Add custom backend URL: `http://localhost:8012`
 3. **Widget Discovery**:
-   - The widget "Dynamic AgGrid Table" should appear in the widgets menu
+   - The widget "Company Revenue Dashboard" should appear in the widgets menu
 4. **Add to Dashboard**:
    - Drag the widget to your dashboard
-   - Configure the three parameters as needed
+   - Configure the parameters as needed
 
 ### Widget Configuration
 
@@ -65,15 +84,56 @@ The widget accepts these parameters:
 
 | Parameter | Type | Default | Description |
 |-----------|------|---------|-------------|
-| `start_date` | Date | 7 days ago | Starting date for data generation |
-| `company_prefix` | Text | "Tech" | Prefix for company names |
-| `data_category` | Dropdown | "financial" | Type of metrics to display |
+| `start_date` | Date | 7 days ago | Starting date for revenue data |
+| `ticker` | Dropdown | "AAPL" | Company ticker symbol |
 
-#### Data Categories Available:
-- **Financial**: Revenue, Profit, EBITDA, Cash Flow, Operating Margin
-- **Operational**: Production, Efficiency, Utilization, Output, Quality Score
-- **Marketing**: CAC, LTV, Conversion Rate, ROAS, Click Rate
-- **HR**: Headcount, Attrition, Satisfaction, Productivity, Training Hours
+#### Available Tickers:
+- **AAPL**: Apple Inc.
+- **MSFT**: Microsoft Corp.
+- **GOOGL**: Alphabet Inc.
+- **AMZN**: Amazon.com Inc.
+- **TSLA**: Tesla Inc.
+- **META**: Meta Platforms Inc.
+- **NVDA**: NVIDIA Corp.
+
+## HTTP API Integration
+
+### API Endpoints
+
+#### GET `/revenue-data`
+Get revenue data using query parameters:
+```bash
+curl "http://localhost:8013/revenue-data?ticker=AAPL&start_date=2024-01-01"
+```
+
+#### POST `/revenue-data`
+Get revenue data using JSON payload:
+```bash
+curl -X POST "http://localhost:8013/revenue-data" \
+  -H "Content-Type: application/json" \
+  -d '{"ticker": "MSFT", "start_date": "2024-01-01"}'
+```
+
+### API Documentation
+
+**Endpoint**: `/revenue-data`
+
+**Parameters**:
+- `ticker` (string): Company ticker symbol (default: "AAPL")
+  - Valid values: AAPL, MSFT, GOOGL, AMZN, TSLA, META, NVDA
+- `start_date` (string, optional): Start date in YYYY-MM-DD format (defaults to 7 days ago)
+
+**Returns**: JSON with revenue data including:
+- Company information (name, sector)
+- 7 days of revenue data with trends
+- Summary statistics (total revenue, average daily revenue)
+
+### Interactive Documentation
+
+Visit `http://localhost:8013/docs` for Swagger UI with:
+- Interactive API testing
+- Request/response examples
+- Schema documentation
 
 ## Data Generation Strategy
 
@@ -97,7 +157,8 @@ Output: 35 rows with companies like "Finance Corp", "Finance Systems"
 ### Project Structure
 ```
 matching-widget-mcp-tool/
-├── main.py           # Main FastAPI application
+├── main.py           # OpenBB Widget FastAPI application
+├── mcp_server.py     # HTTP API server for revenue data
 ├── requirements.txt  # Python dependencies
 └── README.md        # This file
 ```
@@ -107,7 +168,7 @@ matching-widget-mcp-tool/
 #### 1. Widget Registration
 ```python
 @register_widget({
-    "name": "Dynamic AgGrid Table",
+    "name": "Company Revenue Dashboard",
     "type": "table",
     "endpoint": "dynamic_aggrid_table",
     "params": [...],
@@ -116,11 +177,17 @@ matching-widget-mcp-tool/
 ```
 
 #### 2. Data Generation Functions
-- `_get_metrics_map()`: Returns category-to-metrics mapping
-- `_generate_company_data()`: Creates data for single company/day
+- `_get_ticker_info()`: Returns company information for ticker symbols
+- `_generate_revenue_data()`: Creates revenue data for single company/day
 - `dynamic_aggrid_table()`: Main endpoint handling parameters
 
-#### 3. AgGrid Configuration
+#### 3. HTTP API Components
+- `FastAPI`: Web framework for REST endpoints
+- `get_company_revenue_data()`: GET endpoint function
+- `post_company_revenue_data()`: POST endpoint function
+- `RevenueDataRequest`: Pydantic model for validation
+
+#### 4. AgGrid Configuration
 - **Column Definitions**: Data types, formatting, rendering functions
 - **Sparklines**: Trend visualization with styling options
 - **Chart Integration**: Seamless table-to-chart conversion
@@ -188,6 +255,7 @@ The application is configured to work with OpenBB Workspace domains:
 
 - **FastAPI**: Modern, fast web framework for building APIs
 - **Uvicorn**: ASGI server for running FastAPI applications
+- **Pydantic**: Data validation and serialization
 - **Standard Library**: `datetime`, `random`, `functools`, `asyncio`, `pathlib`
 
 ## License

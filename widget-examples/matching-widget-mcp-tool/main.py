@@ -100,6 +100,10 @@ def get_widgets():
     "type": "table",
     "endpoint": "dynamic_aggrid_table",
     "gridData": {"w": 24, "h": 12},
+    "mcp_tool": {
+      "mcp_server": "Financial Data",
+      "tool_id": "get_company_revenue_data"
+    },
     "params": [
         {
             "paramName": "start_date",
