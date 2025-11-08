@@ -1,0 +1,14 @@
+{
+  "html_binance_ohlc": {
+    "name": "BinanceUS OHLC",
+    "description": "Displays OHLC for a given symbol",
+    "category": "Crypto",
+    "type": "html",
+    "endpoint": "html_binance_ohlc",
+    "gridData": {
+      "w": 20,
+      "h": 9
+    },
+    "source": "BinanceUS"
+  }
+}
