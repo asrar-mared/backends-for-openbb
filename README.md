@@ -49,53 +49,20 @@ The Main tenants are:
 
 ## Getting Started
 
-We recommend starting with the [getting-started/hello-world](getting-started/hello-world/README.md) example. Then Moving on to the [getting-started/reference-backend](getting-started/reference-backend/README.md).
+We recommend starting with the [getting-started/hello-world](getting-started/hello-world/README.md) example.
+
+Then Moving on to the [getting-started/reference-backend](getting-started/reference-backend/README.md).
 
 This will give you a good understanding of how to setup your own backend and connect it to OpenBB Workspace.
 
-## Supported Integrations and Apps
+### Leveraging AI
 
-Each Integration below has a folder which contains an example of different implementations - We recommend starting with the Table Widget Example.
+If you are utilizing a coding agent to build your OpenBB backend, we recommend:
+- Utilizing the following MCP Server to enhance coding agent with OpenBB docs: [https://smithery.ai/server/@DidierRLopes/openbb-docs-mcp](https://smithery.ai/server/@DidierRLopes/openbb-docs-mcp)
+- Or providing the entire documentation to the agent in markdown format by copy-pasting this link into context: [https://docs.openbb.co/workspace/llms-full.txt](https://docs.openbb.co/workspace/llms-full.txt).
 
-### Apps
+For more examples on setting up your own App - you can head to our documentation at [https://docs.openbb.co/workspace](https://docs.openbb.co/workspace).
 
-| App | Description |
-| ----------- | ----------- |
-| [demo-risk](/demo-apps/demo-risk/README.md) | A simple risk app |
-| [dtcc_trade_repository](/demo-apps/dtcc_trade_repository/README.md) | A simple trade repository app |
+## Examples of apps
 
-### Widgets
-
-| Integration | Description |
-| ----------- | ----------- |
-| [Table Widget](/widget-examples/widget-types/table-widget) | A simple table widget from a file or endpoint |
-| [Chart Widget](/widget-examples/widget-types/chart-widget) | How to return a plotly chart or a built in chart |
-| [Markdown Widget](/widget-examples/widget-types/markdown-widget) | Markdown Widget and example with a parameter |
-| [Metric Widget](/widget-examples/widget-types/metric-widget) | Showing a single metric |
-| [Multi File Viewer](/widget-examples/widget-types/multi-file-viewer) | How to return a multi file viewer |
-| [PDF Widget](/widget-examples/widget-types/pdf-widget) | How to return a PDF file |
-| [News Widget](/widget-examples/widget-types/news-widget) | How to return a news widget |
-| [Advanced Charting](/widget-examples/widget-types/advanced-charting) | How to return an advanced chart |
-| [Live Grid](/widget-examples/widget-types/live-grid) | How to return a live grid |
-
-### Parameters
-
-| Parameter Examples | Description |
-| ----------- | ----------- |
-| [Parameters Widget](/widget-examples/parameter-types/parameters-example) | Example of setting up widgets with parameters |
-| [Grouping Widgets](/widget-examples/parameter-types/grouping_widgets) | How to group widgets on the dashboard |
-| [Column and Cell Rendering](/widget-examples/parameter-types/column_and_cell_rendering) | An example of widgets with custom column and cell rendering |
-| [Form Parameters](/widget-examples/parameter-types/form-parameters) | How to return a form parameter |
-
-### Database Connectors
-
-| Database Connection Examples | Description |
-| ----------- | ----------- |
-| [ClickHouse](/widget-examples/database-connectors/clickhouse_python/README.md) | ClickHouse is an open-source column-oriented DBMS. |
-| [Supabase](/widget-examples/database-connectors/supabase_python/README.md) | Supabase is an open source Firebase alternative. |
-| [MindsDB](/widget-examples/database-connectors/mindsdb_python/README.md) | MindsDB is an open-source AI layer for existing databases. |
-| [ElasticSearch](/widget-examples/database-connectors/elasticsearch_python/README.md) | Elasticsearch is a search engine based on the Lucene library. |
-| [ArticDB](/widget-examples/database-connectors/articdb_python/README.md) | Using ArticDB to add data to a widget. |
-| [Snowflake](/widget-examples/database-connectors/snowflake_connector_python/README.md) | Snowflake is a cloud-based data warehousing platform. |
-
-For more examples on setting up your own App - you can head to our documentation at <https://docs.openbb.co/workspace>.
+Check awesome open source OpenBB apps built by our team or by the community here: [https://github.com/OpenBB-finance/awesome-openbb](https://github.com/OpenBB-finance/awesome-openbb).
