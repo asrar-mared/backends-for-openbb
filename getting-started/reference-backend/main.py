@@ -12,9 +12,45 @@ from plotly_config import get_theme_colors, base_layout, get_toolbar_config
 import random
 from pydantic import BaseModel, Field
 from uuid import UUID
-from typing import Any, List, Literal, List
+from typing import Any, List, Literal, List, Union
 from functools import wraps
 import asyncio
+
+
+# Pydantic models for multi-file viewer POST endpoints
+class FileOption(BaseModel):
+    """File option for multi-file viewer selection"""
+    label: str
+    value: str
+
+
+class FileRequest(BaseModel):
+    """Request model for multi-file viewer POST endpoints"""
+    filenames: List[str]
+
+
+class FileDataFormat(BaseModel):
+    """Data format specification for files"""
+    data_type: str
+    filename: str
+
+
+class DataContent(BaseModel):
+    """Response model for file content in base64 format"""
+    content: str
+    data_format: FileDataFormat
+
+
+class DataUrl(BaseModel):
+    """Response model for file URL"""
+    url: str
+    data_format: FileDataFormat
+
+
+class DataError(BaseModel):
+    """Error response model for file requests"""
+    error_type: str
+    content: str
 
 
 # Initialize FastAPI application with metadata
@@ -1213,20 +1249,18 @@ SAMPLE_PDFS = [
 # and return it in the JSON format. The reason why we need this endpoint is because the multi_file_viewer widget
 # needs to know the list of available PDFs to display and we pass this endpoint to the widget as the optionsEndpoint
 @app.get("/get_pdf_options")
-async def get_pdf_options():
+async def get_pdf_options() -> List[FileOption]:
     """Get list of available PDFs"""
     return [
-        {
-            "label": pdf["name"],
-            "value": pdf["name"]
-        } for pdf in SAMPLE_PDFS
+        FileOption(label=pdf["name"], value=pdf["name"]) 
+        for pdf in SAMPLE_PDFS
     ]
 
 @register_widget({
     "name": "Multi PDF Viewer - Base64",
     "description": "View multiple PDF files using base64 encoding",
     "type": "multi_file_viewer",
-    "endpoint": "multi_pdf_base64",
+    "endpoint": "/multi_pdf_base64",
     "gridData": {
         "w": 20,
         "h": 10
@@ -1245,36 +1279,55 @@ async def get_pdf_options():
         }
     ]
 })
-@app.get("/multi_pdf_base64")
-async def get_multi_pdf_base64(pdf_name: str):
-    """Get PDF content in base64 format"""
-    pdf = next((p for p in SAMPLE_PDFS if p["name"] == pdf_name), None)
-    if not pdf:
-        raise HTTPException(status_code=404, detail="PDF not found")
+@app.post("/multi_pdf_base64")
+async def get_multi_pdf_base64(
+    pdf_name: List[str] = Body(..., embed=True)
+) -> List[Union[DataContent, DataError]]:
+    """Get multiple PDF files in base64 format"""
+    files = []
+    for name in pdf_name:
+        pdf = next((p for p in SAMPLE_PDFS if p["name"] == name), None)
+        if not pdf:
+            files.append(
+                DataError(
+                    error_type="not_found", 
+                    content=f"PDF '{name}' not found"
+                ).model_dump()
+            )
+            continue
 
-    file_path = ROOT_PATH / pdf["location"]
-    if not file_path.exists():
-        raise HTTPException(status_code=404, detail="PDF file not found")
+        file_path = ROOT_PATH / pdf["location"]
+        if not file_path.exists():
+            files.append(
+                DataError(
+                    error_type="not_found",
+                    content=f"PDF file '{pdf['location']}' not found on disk"
+                ).model_dump()
+            )
+            continue
 
-    with open(file_path, "rb") as file:
-        base64_content = base64.b64encode(file.read()).decode("utf-8")
+        with open(file_path, "rb") as file:
+            base64_content = base64.b64encode(file.read()).decode("utf-8")
+            files.append(
+                DataContent(
+                    content=base64_content,
+                    data_format=FileDataFormat(
+                        data_type="pdf",
+                        filename=f"{pdf['name']}.pdf"
+                    )
+                ).model_dump()
+            )
 
     return JSONResponse(
         headers={"Content-Type": "application/json"},
-        content={
-            "data_format": {
-                "data_type": "pdf",
-                "filename": f"{pdf['name']}.pdf"
-            },
-            "content": base64_content,
-        },
+        content=files
     )
 
 @register_widget({
     "name": "Multi PDF Viewer - URL",
     "description": "View multiple PDF files using URLs",
     "type": "multi_file_viewer", 
-    "endpoint": "multi_pdf_url",
+    "endpoint": "/multi_pdf_url",
     "gridData": {
         "w": 20,
         "h": 10
@@ -1293,19 +1346,44 @@ async def get_multi_pdf_base64(pdf_name: str):
         }
     ]
 })
-@app.get("/multi_pdf_url")
-async def get_multi_pdf_url(pdf_name: str):
-    """Get PDF URL"""
-    pdf = next((p for p in SAMPLE_PDFS if p["name"] == pdf_name), None)
-    if not pdf:
-        raise HTTPException(status_code=404, detail="PDF not found")
+@app.post("/multi_pdf_url")
+async def get_multi_pdf_url(
+    pdf_name: List[str] = Body(..., embed=True)
+) -> List[Union[DataUrl, DataError]]:
+    """Get multiple PDF files via URLs"""
+    files = []
+    for name in pdf_name:
+        pdf = next((p for p in SAMPLE_PDFS if p["name"] == name), None)
+        if not pdf:
+            files.append(
+                DataError(
+                    error_type="not_found",
+                    content=f"PDF '{name}' not found"
+                ).model_dump()
+            )
+            continue
+
+        if url := pdf.get("url"):
+            files.append(
+                DataUrl(
+                    url=url,
+                    data_format=FileDataFormat(
+                        data_type="pdf",
+                        filename=f"{pdf['name']}.pdf"
+                    )
+                ).model_dump()
+            )
+        else:
+            files.append(
+                DataError(
+                    error_type="not_found",
+                    content=f"URL not found for '{name}'"
+                ).model_dump()
+            )
 
     return JSONResponse(
         headers={"Content-Type": "application/json"},
-        content={
-            "data_format": {"data_type": "pdf", "filename": f"{pdf['name']}.pdf"},
-            "url": pdf["url"],
-        },
+        content=files
     )
 
 # This is a simple markdown widget with a date picker parameter
