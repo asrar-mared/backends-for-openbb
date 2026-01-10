@@ -5,3 +5,4 @@ fastapi-cache2==0.2.1
 python-multipart==0.0.6
 mysql-connector-python==8.2.0
 requests==2.31.0
+urllib3>=2.6.3 # not directly required, pinned by Snyk to avoid a vulnerability
