@@ -4,3 +4,4 @@ pandas==2.0.3
 plotly==5.15.0
 requests==2.31.0
 highcharts-core==1.10.3
+urllib3>=2.6.3 # not directly required, pinned by Snyk to avoid a vulnerability
